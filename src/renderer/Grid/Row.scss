@@ -30,6 +30,21 @@
   &[data-hidden="true"] {
     filter: opacity(50%) grayscale(100%);
   }
+  &[data-burndown] {
+    --burndown-color: var(--semantic-primary);
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--burndown-color) 18%, transparent)
+        var(--burndown, 100%),
+      transparent var(--burndown, 100%)
+    );
+  }
+  &[data-burndown="warning"] {
+    --burndown-color: var(--semantic-warning);
+  }
+  &[data-burndown="overdue"] {
+    --burndown-color: var(--semantic-error);
+  }
   &:last-child {
     border-bottom-left-radius: 0.25em;
   }

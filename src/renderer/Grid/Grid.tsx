@@ -3,6 +3,7 @@ import List from "@mui/material/List";
 import { SnackbarAction } from "../../@types";
 import Row from "./Row";
 import Group from "./Group";
+import { useHourlyTick } from "../hooks/useHourlyTick";
 import "./Grid.scss";
 import {
   ContextMenu,
@@ -43,6 +44,7 @@ const GridComponent: React.FC<GridComponentProps> = memo(
     onNotification,
   }) => {
     const renderedRows: number[] = [];
+    const now = useHourlyTick(!!settings.burndown);
     const list = document.getElementById("grid");
     const [loadMoreRows, setLoadMoreRows] = useState(false);
     const [maxRows, setMaxRows] = useState(
@@ -152,6 +154,7 @@ const GridComponent: React.FC<GridComponentProps> = memo(
                     setContextMenu={setContextMenu}
                     setPromptItem={setPromptItem}
                     settings={settings}
+                    now={now}
                     onNotification={onNotification}
                   />,
                 );

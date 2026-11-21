@@ -97,6 +97,8 @@ function buildAppFixture(welcomeScreenShown: boolean) {
         bulkTodoCreation: false,
         disableAnimations: false,
         useHumanFriendlyDates: false,
+        burndown: false,
+        burndownWindow: 7,
         excludeLinesWithPrefix: null,
         channel: "Test",
         menuBarVisibility: true,

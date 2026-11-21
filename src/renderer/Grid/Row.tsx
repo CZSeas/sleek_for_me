@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { SnackbarAction } from "@sleek-types";
 import { useAttributeContextMenu } from "../Shared/useAttributeContextMenu";
 import { useRowContextMenu } from "../Shared/useRowContextMenu";
+import { getBurndown } from "./burndown";
 
 import RendererComponent from "./Renderer";
 import { HandleFilterSelect, IsSelected } from "../Shared";
@@ -32,6 +33,7 @@ interface RowProps {
   setContextMenu: React.Dispatch<React.SetStateAction<ContextMenu | null>>;
   setPromptItem: React.Dispatch<React.SetStateAction<PromptItem | null>>;
   settings: SettingStore;
+  now: number;
   onNotification: React.Dispatch<SnackbarAction>;
 }
 
@@ -44,9 +46,18 @@ const Row: React.FC<RowProps> = memo(
     setContextMenu,
     setPromptItem,
     settings,
+    now,
     onNotification,
   }) => {
     const { t } = useTranslation();
+    const burndown = settings.burndown
+      ? getBurndown(
+          todoObject.due,
+          todoObject.complete,
+          now,
+          settings.burndownWindow ?? 7,
+        )
+      : null;
     const { handleContextMenu: handleAttributeContextMenu } =
       useAttributeContextMenu({
         setContextMenu,
@@ -164,6 +175,14 @@ const Row: React.FC<RowProps> = memo(
           className="row"
           data-complete={todoObject.complete}
           data-hidden={todoObject.hidden}
+          data-burndown={burndown?.level}
+          style={
+            burndown
+              ? ({
+                  "--burndown": `${burndown.percent}%`,
+                } as React.CSSProperties)
+              : undefined
+          }
           onClick={(event) => handleRowClick(event)}
           onKeyDown={(event) => handleRowClick(event)}
           onContextMenu={(event) =>

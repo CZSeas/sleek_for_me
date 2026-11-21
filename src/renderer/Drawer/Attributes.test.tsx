@@ -27,6 +27,8 @@ describe("DrawerAttributes", () => {
     const settings = {
       showAttributesFromHiddenTodosInDrawer: false,
       useHumanFriendlyDates: false,
+      burndown: false,
+      burndownWindow: 7,
       accordionOpenState: [true],
     } as SettingStore;
     const attributes = {

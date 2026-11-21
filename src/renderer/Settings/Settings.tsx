@@ -49,6 +49,17 @@ const visibleSettings: VisibleSettings = {
     style: "toggle",
     help: "https://github.com/ransome1/sleek/wiki/Human-friendly-dates",
   },
+  burndown: {
+    style: "toggle",
+  },
+  burndownWindow: {
+    style: "slider",
+    min: 7,
+    max: 30,
+    step: 1,
+    unitKey: "settings.days",
+    dependsOn: ["burndown"],
+  },
   tray: {
     style: "toggle",
   },

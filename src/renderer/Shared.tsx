@@ -174,6 +174,16 @@ export const friendlyDate = (
     return results;
   }
 
+  // Next week - the following calendar week (based on weekStart)
+  const endOfNextWeek = today
+    .plus({ weeks: 1 })
+    .endOf("week", { useLocaleWeeks: true });
+
+  if (date <= endOfNextWeek) {
+    results.push(t("drawer.attributes.nextWeek"));
+    return results;
+  }
+
   // This month - rest of current month
   const endOfThisMonth = today.endOf("month");
 

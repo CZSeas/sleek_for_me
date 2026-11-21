@@ -36,6 +36,8 @@
   "settings.zoom": "Zoom",
   "settings.disableAnimations": "Disable animations",
   "settings.useHumanFriendlyDates": "Use human friendly dates",
+  "settings.burndown": "Burndown mode",
+  "settings.burndownWindow": "Burndown window",
   "settings.weekStart": "First day of the week",
   "settings.0": "Sunday",
   "settings.1": "Monday",

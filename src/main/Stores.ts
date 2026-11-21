@@ -160,6 +160,11 @@ const migrations = {
       config.set("welcomeScreenShown", false);
     }
   },
+  "2.1.3": (config) => {
+    console.log("Migrating settings store → 2.1.3: burndown");
+    config.set("burndown", false);
+    config.set("burndownWindow", 7);
+  },
   "2.1.2": (colors) => {
     console.log("Repairing priority A selected color → 2.1.2");
     const selectedBackground = colors.get(
@@ -208,6 +213,15 @@ export const SettingsStore = new Store<SettingStore>({
   name: "config",
   migrations,
 });
+
+// Migrations only run up to the app version, so make sure new settings have
+// defaults even before the version bump that triggers the 2.1.3 migration.
+if (SettingsStore.get("burndown") === undefined) {
+  SettingsStore.set("burndown", false);
+}
+if (SettingsStore.get("burndownWindow") === undefined) {
+  SettingsStore.set("burndownWindow", 7);
+}
 
 let _filtersStore: Store | null = null;
 

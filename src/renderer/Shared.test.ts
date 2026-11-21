@@ -1,4 +1,4 @@
-import { expect, describe, it } from "vitest";
+import { expect, describe, it, vi, afterEach } from "vitest";
 import { DateTime, Settings as LuxonSettings, WeekdayNumbers } from "luxon";
 import { attributeDisplayValue, friendlyDate } from "./Shared";
 import { SettingStore } from "@sleek-types";
@@ -124,25 +124,71 @@ describe("friendlyDate", () => {
     });
   });
 
-  describe("This month (rest of current month, after this week)", () => {
-    it("should return 'This month' for dates in current month but beyond this week", () => {
+  describe("Next week", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    // 2026-03-04 is a Wednesday; with a Monday week start:
+    // this week = Mar 2-8, next week = Mar 9-15
+    const freeze = () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(2026, 2, 4, 12, 0, 0));
+    };
+
+    it.each(["2026-03-09", "2026-03-12", "2026-03-15"])(
+      "should return 'Next week' for %s",
+      (date) => {
+        freeze();
+        const result = friendlyDate(date, "due", mockSettings, mockT);
+        expect(result).toEqual(["drawer.attributes.nextWeek"]);
+      },
+    );
+
+    it("should keep the end of this week as 'This week'", () => {
+      freeze();
+      const result = friendlyDate("2026-03-08", "due", mockSettings, mockT);
+      expect(result).toEqual(["drawer.attributes.thisWeek"]);
+    });
+
+    it("should return 'Next week' even when next week crosses into next month", () => {
+      // Wed 2026-03-25: next week = Mar 30 - Apr 5
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(2026, 2, 25, 12, 0, 0));
+      const result = friendlyDate("2026-04-02", "due", mockSettings, mockT);
+      expect(result).toEqual(["drawer.attributes.nextWeek"]);
+    });
+
+    it("should not return 'Next week' for the week after next", () => {
+      freeze();
+      const result = friendlyDate("2026-03-16", "due", mockSettings, mockT);
+      expect(result).toEqual(["drawer.attributes.thisMonth"]);
+    });
+  });
+
+  describe("This month (rest of current month, after next week)", () => {
+    it("should return 'This month' for dates in current month but beyond next week", () => {
       LuxonSettings.defaultWeekSettings = {
         firstDay: 1 as WeekdayNumbers,
         minimalDays: 4,
         weekend: [6, 7],
       };
       const now = DateTime.now().startOf("day");
-      const endOfThisWeek = now.endOf("week", { useLocaleWeeks: true });
+      const endOfNextWeek = now
+        .plus({ weeks: 1 })
+        .endOf("week", { useLocaleWeeks: true });
       const endOfThisMonth = now.endOf("month");
 
-      const daysUntilEndOfWeek = endOfThisWeek.diff(now, "days").days;
-      const daysUntilEndOfMonth = endOfThisMonth.diff(now, "days").days;
+      const daysUntilEndOfNextWeek = Math.ceil(
+        endOfNextWeek.diff(now, "days").days,
+      );
+      const daysUntilEndOfMonth = Math.floor(
+        endOfThisMonth.diff(now, "days").days,
+      );
 
-      // If there's room between end of week and end of month, test a date there
-      if (daysUntilEndOfWeek < daysUntilEndOfMonth - 1) {
-        const dateInThisMonth = getRelativeDate(
-          Math.floor(daysUntilEndOfWeek) + 2,
-        );
+      // Only test if there's room between next week and the end of the month
+      if (daysUntilEndOfNextWeek < daysUntilEndOfMonth) {
+        const dateInThisMonth = getRelativeDate(daysUntilEndOfNextWeek);
         const result = friendlyDate(
           dateInThisMonth,
           "due",
@@ -150,25 +196,36 @@ describe("friendlyDate", () => {
           mockT,
         );
         expect(result).toContain("drawer.attributes.thisMonth");
-        expect(result).not.toContain("drawer.attributes.thisWeek");
+        expect(result).not.toContain("drawer.attributes.nextWeek");
       }
     });
   });
 
   describe("Next month", () => {
     it("should return 'Next month' for dates in the following month", () => {
-      // Calculate days until end of current month, then add a few days into next month
+      LuxonSettings.defaultWeekSettings = {
+        firstDay: 1 as WeekdayNumbers,
+        minimalDays: 4,
+        weekend: [6, 7],
+      };
       const now = DateTime.now().startOf("day");
-      const daysUntilEndOfMonth = now.endOf("month").diff(now, "days").days;
-      const dateInNextMonth = getRelativeDate(
-        Math.ceil(daysUntilEndOfMonth) + 2,
+      const endOfNextWeek = now
+        .plus({ weeks: 1 })
+        .endOf("week", { useLocaleWeeks: true });
+      const daysUntilEndOfMonth = Math.ceil(
+        now.endOf("month").diff(now, "days").days,
       );
-      const dateObj = DateTime.fromISO(dateInNextMonth);
+      // First day of next month, pushed past next week if necessary
+      const dateObj = DateTime.fromISO(
+        getRelativeDate(daysUntilEndOfMonth + 1),
+      );
+      const candidate =
+        dateObj <= endOfNextWeek ? endOfNextWeek.plus({ days: 1 }) : dateObj;
 
-      // Only test if the date is actually in a different month
-      if (dateObj.month !== now.month || dateObj.year !== now.year) {
+      // Only test if the date is actually in the following month
+      if (candidate <= now.plus({ months: 1 }).endOf("month")) {
         const result = friendlyDate(
-          dateInNextMonth,
+          candidate.toISODate()!,
           "due",
           mockSettings,
           mockT,

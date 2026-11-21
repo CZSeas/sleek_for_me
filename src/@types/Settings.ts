@@ -10,6 +10,8 @@ export interface SettingStore {
   appendCreationDate: boolean;
   convertRelativeToAbsoluteDates: boolean;
   useHumanFriendlyDates: boolean;
+  burndown: boolean;
+  burndownWindow: number;
   bulkTodoCreation: boolean;
   weekStart: 1 | 6 | 0;
   language: string;
