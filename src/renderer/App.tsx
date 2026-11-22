@@ -6,6 +6,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { snackbarReducer, initialSnackbarState } from "./hooks/useAppState";
+import { useWindowSnapHotkeys } from "./hooks/useWindowSnapHotkeys";
 
 import NavigationComponent from "./Navigation";
 import GridComponent from "./Grid/Grid";
@@ -42,6 +43,7 @@ const { store, ipcRenderer } = window.api;
 
 const App = (): JSX.Element => {
   const [settings, setSettings] = useState<SettingStore>(store.getConfig());
+  useWindowSnapHotkeys(ipcRenderer.send);
   const [snackbar, dispatchSnackbar] = useReducer(
     snackbarReducer,
     initialSnackbarState,

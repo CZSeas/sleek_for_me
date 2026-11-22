@@ -1,4 +1,10 @@
-import { ipcMain, IpcMainEvent, shell, clipboard } from "electron";
+import {
+  BrowserWindow,
+  ipcMain,
+  IpcMainEvent,
+  shell,
+  clipboard,
+} from "electron";
 import { changeCompleteState } from "./DataRequest/ChangeCompleteState";
 import {
   SettingsStore,
@@ -18,6 +24,7 @@ import { activateFile, removeFile, registerTodoFile } from "./File/File";
 import { openFile, createFile } from "./File/Dialog";
 import { HandleError } from "./Shared";
 import { handleRenameFilterValue, handleDeleteFilterValue } from "./IpcMain";
+import { snapWindow, isSnapSide } from "./WindowSnap";
 import path from "path";
 
 interface IpcHandlerEntry {
@@ -346,6 +353,15 @@ function handleRevealInFileManager(_: IpcMainEvent, filePath: string): void {
   }
 }
 
+function handleSnapWindow(event: IpcMainEvent, side: unknown): void {
+  try {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win && isSnapSide(side)) snapWindow(win, side);
+  } catch (error) {
+    if (error instanceof Error) HandleError(error);
+  }
+}
+
 // ─── Handler registry ────────────────────────────────────────────────────
 
 function handleToggleTodoComplete(
@@ -418,6 +434,10 @@ export const ipcHandlers: IpcHandlerEntry[] = [
   {
     channel: "openInBrowser",
     handler: handleOpenInBrowser,
+  },
+  {
+    channel: "snapWindow",
+    handler: handleSnapWindow,
   },
   {
     channel: "requestData",

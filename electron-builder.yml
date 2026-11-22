@@ -110,9 +110,16 @@ linux:
       arch:
         - arm64
         - x64
+# Native Wayland clients cannot position their own windows, which breaks window
+# snapping, so launch from the desktop entry through X11 (XWayland).
+deb:
+  executableArgs:
+    - "--ozone-platform=x11"
 # RPM symlinks are conflicting with other Electron apps using the same Electron version
 # https://github.com/ferdium/ferdium-app/issues/416
 rpm:
+  executableArgs:
+    - "--ozone-platform=x11"
   fpm:
     - "--rpm-rpmbuild-define"
     - "_build_id_links none"
