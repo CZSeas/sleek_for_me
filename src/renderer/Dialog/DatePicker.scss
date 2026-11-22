@@ -34,6 +34,13 @@
   z-index: 2000 !important;
 }
 
+// Shrink the popup of a time picker to its content
+.MuiPickerPopper-paper:has(.MuiMultiSectionDigitalClock-root),
+.MuiPickersLayout-root:has(.MuiMultiSectionDigitalClock-root) {
+  min-width: 0;
+  width: fit-content;
+}
+
 .MuiPickersLayout-root {
   max-height: 20em;
   .MuiYearCalendar-root {
@@ -68,6 +75,33 @@
     .MuiPickersDay-root {
       width: 3em;
       height: 3em;
+    }
+  }
+  // Time picker: the popup fits the hour and minute columns instead of the
+  // 320px MUI reserves for a calendar, with tight items and compact buttons
+  .MuiMultiSectionDigitalClock-root {
+    width: auto;
+    justify-content: center;
+  }
+  .MuiMultiSectionDigitalClockSection-root {
+    // Standard properties (they also disable the ::-webkit-scrollbar ones):
+    // only the moving thumb, in the theme's grey, without a track
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-outlineVariant) transparent;
+  }
+  .MuiMultiSectionDigitalClockSection-item {
+    min-height: 0;
+    padding: 0.2em 0;
+    margin: 1px 4px;
+    line-height: 1.4;
+  }
+  .MuiPickersLayout-actionBar {
+    padding: 0.15em 0.25em;
+    justify-content: space-between;
+    button {
+      min-width: 0;
+      padding: 0.15em 0.5em;
+      font-size: 0.85em;
     }
   }
   button {

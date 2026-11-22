@@ -11,6 +11,84 @@ vi.mock("../Stores", () => ({
   },
 }));
 
+describe("due time", () => {
+  it("reads due_time as HH:mm", () => {
+    const todo = createTodoObject(1, "Call Sam due:2026-11-23 due_time:1430");
+    expect(todo.dueTime).toBe("14:30");
+    expect(todo.string).toBe("Call Sam due:2026-11-23 due_time:1430");
+  });
+
+  it("has no time when the tag is missing", () => {
+    expect(createTodoObject(1, "Call Sam due:2026-11-23").dueTime).toBeNull();
+  });
+
+  it("ignores an invalid time", () => {
+    expect(
+      createTodoObject(1, "Call Sam due:2026-11-23 due_time:2599").dueTime,
+    ).toBeNull();
+  });
+
+  it("ignores a time without a due date", () => {
+    expect(createTodoObject(1, "Call Sam due_time:1430").dueTime).toBeNull();
+  });
+
+  it("sets the time from HH:mm and stores HHmm", () => {
+    const todo = createTodoObject(
+      1,
+      "Call Sam due:2026-11-23",
+      "due_time",
+      "09:05",
+    );
+    expect(todo.dueTime).toBe("09:05");
+    expect(todo.string).toBe("Call Sam due:2026-11-23 due_time:0905");
+  });
+
+  it("updates an existing time", () => {
+    const todo = createTodoObject(
+      1,
+      "Call Sam due:2026-11-23 due_time:1430",
+      "due_time",
+      "16:45",
+    );
+    expect(todo.dueTime).toBe("16:45");
+    expect(todo.string).toBe("Call Sam due:2026-11-23 due_time:1645");
+  });
+
+  it("removes the time when it is cleared", () => {
+    const todo = createTodoObject(
+      1,
+      "Call Sam due:2026-11-23 due_time:1430",
+      "due_time",
+      "",
+    );
+    expect(todo.dueTime).toBeNull();
+    expect(todo.string).toBe("Call Sam due:2026-11-23");
+  });
+
+  it("removes the time when the due date is cleared", () => {
+    const todo = createTodoObject(
+      1,
+      "Call Sam due:2026-11-23 due_time:1430",
+      "due",
+      "",
+    );
+    expect(todo.due).toBeNull();
+    expect(todo.dueTime).toBeNull();
+    expect(todo.string).toBe("Call Sam");
+  });
+
+  it("keeps the time when only the due date changes", () => {
+    const todo = createTodoObject(
+      1,
+      "Call Sam due:2026-11-23 due_time:1430",
+      "due",
+      "2026-11-30",
+    );
+    expect(todo.due).toBe("2026-11-30");
+    expect(todo.dueTime).toBe("14:30");
+  });
+});
+
 describe("createTodoObject", () => {
   beforeEach(() => {
     vi.clearAllMocks();

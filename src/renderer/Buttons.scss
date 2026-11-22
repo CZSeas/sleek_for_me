@@ -43,6 +43,7 @@ button {
     padding: 0.25em 0.5em;
   }
   [data-todotxt-attribute="due"],
+  [data-todotxt-attribute="due_time"],
   [data-todotxt-attribute="t"],
   [data-todotxt-attribute="rec"] {
     button {
@@ -59,6 +60,12 @@ button {
       height: 100%;
       padding: 0.1em 0;
     }
+  }
+
+  // Browsers align a <button>'s flex children to the top by default, which
+  // left the time value hanging at the top of the chip
+  [data-todotxt-attribute="due_time"] button {
+    align-items: center;
   }
 
   &.group {

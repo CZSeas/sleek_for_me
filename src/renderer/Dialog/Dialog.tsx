@@ -8,6 +8,7 @@ import { DateTime } from "luxon";
 import AutoSuggest from "./AutoSuggest";
 import PriorityPicker from "./PriorityPicker";
 import DatePicker from "./DatePicker";
+import TimePicker from "./TimePicker";
 import PomodoroPicker from "./PomodoroPicker";
 import RecurrencePicker from "../Picker/RecurrencePicker";
 import "./Dialog.scss";
@@ -41,6 +42,7 @@ const DialogComponent: React.FC<DialogComponentProps> = memo(
   }) => {
     const [priority, setPriority] = useState<string>("-");
     const [dueDate, setDueDate] = useState<string | null>(null);
+    const [dueTime, setDueTime] = useState<string | null>(null);
     const [thresholdDate, setThresholdDate] = useState<string | null>(null);
     const [recurrence, setRecurrence] = useState<string | null>(null);
     const [pomodoro, setPomodoro] = useState<number | string>(0);
@@ -94,6 +96,7 @@ const DialogComponent: React.FC<DialogComponentProps> = memo(
       if (todoObject) {
         setPriority(todoObject?.priority || "-");
         setDueDate(todoObject?.due || null);
+        setDueTime(todoObject?.dueTime || null);
         setThresholdDate(todoObject?.t || null);
         setRecurrence(todoObject?.rec || null);
         setPomodoro(todoObject?.pm || 0);
@@ -195,6 +198,12 @@ const DialogComponent: React.FC<DialogComponentProps> = memo(
             handleChange={(type, value) =>
               handleChange(type, value ? value.toString() : "")
             }
+          />
+          <TimePicker
+            time={dueTime}
+            disabled={!dueDate}
+            settings={settings}
+            handleChange={(time) => handleChange("due_time", time)}
           />
           <DatePicker
             date={thresholdDate}

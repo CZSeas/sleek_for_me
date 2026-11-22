@@ -6,6 +6,7 @@ import { SnackbarAction } from "../../@types";
 
 import PomodoroIcon from "../../../resources/pomodoro.svg?asset";
 import DatePickerInline from "./DatePickerInline";
+import DueTimeInline from "./DueTimeInline";
 import RecurrencePicker from "../Picker/RecurrencePicker";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { handleLinkClick, HandleFilterSelect, IsSelected } from "../Shared";
@@ -24,7 +25,7 @@ interface RendererComponentProps {
   onNotification?: React.Dispatch<SnackbarAction>;
 }
 
-type ReplacementsKey = AttributeKey | "url" | "custom-tag";
+type ReplacementsKey = AttributeKey | "due_time" | "url" | "custom-tag";
 
 const RendererComponent: React.FC<RendererComponentProps> = memo(
   ({ todoObject, filters, settings, setContextMenu, onNotification }) => {
@@ -49,6 +50,17 @@ const RendererComponent: React.FC<RendererComponentProps> = memo(
         type: "due",
         key: "due:",
       },
+      // Only a valid time next to a due date becomes a chip; anything else
+      // stays plain text
+      ...(todoObject.dueTime
+        ? [
+            {
+              pattern: /(?:^|\s)due_time:(\d{4})(?=\s|$)/,
+              type: "due_time" as ReplacementsKey,
+              key: "due_time:",
+            },
+          ]
+        : []),
       { pattern: /(?:^|\s)@(\S+)/, type: "contexts", key: "@" },
       { pattern: /(?:^|\s)\+(\S+)/, type: "projects", key: "+" },
       { pattern: /(?:^|\s)h:1\b/, type: "hidden", key: "h:1" },
@@ -76,17 +88,29 @@ const RendererComponent: React.FC<RendererComponentProps> = memo(
       [key: string]: (value: string, type: ReplacementsKey) => React.ReactNode;
     } = {
       due: (_, type) => (
-        <DatePickerInline
-          type={type as AttributeKey}
-          todoObject={todoObject}
-          date={todoObject.due}
-          filters={filters}
-          settings={settings}
-          onContextMenu={(e) =>
-            todoObject.due &&
-            handleContextMenu(e, todoObject.due, type as AttributeKey)
-          }
-        />
+        <>
+          <DatePickerInline
+            type={type as AttributeKey}
+            todoObject={todoObject}
+            date={todoObject.due}
+            filters={filters}
+            settings={settings}
+            onContextMenu={(e) =>
+              todoObject.due &&
+              handleContextMenu(e, todoObject.due, type as AttributeKey)
+            }
+          />
+          {todoObject.due && !todoObject.dueTime ? (
+            <DueTimeInline
+              todoObject={todoObject}
+              settings={settings}
+              placeholder
+            />
+          ) : null}
+        </>
+      ),
+      due_time: () => (
+        <DueTimeInline todoObject={todoObject} settings={settings} />
       ),
       t: (_, type) => (
         <DatePickerInline

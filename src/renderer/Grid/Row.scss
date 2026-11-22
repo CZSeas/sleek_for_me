@@ -30,6 +30,15 @@
   &[data-hidden="true"] {
     filter: opacity(50%) grayscale(100%);
   }
+  // "+ time" chip for due dates without a time, only visible while hovering
+  // or focusing the row
+  .due-time-placeholder {
+    opacity: 0;
+  }
+  &:hover .due-time-placeholder,
+  &:focus-within .due-time-placeholder {
+    opacity: 0.5;
+  }
   &[data-burndown] {
     --burndown-color: var(--semantic-primary);
     background: linear-gradient(

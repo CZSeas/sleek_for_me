@@ -29,6 +29,7 @@ describe("DrawerAttributes", () => {
       useHumanFriendlyDates: false,
       burndown: false,
       burndownWindow: 7,
+      burndownWarning: 2,
       accordionOpenState: [true],
     } as SettingStore;
     const attributes = {

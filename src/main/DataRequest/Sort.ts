@@ -50,6 +50,8 @@ function parseRecurrenceSortKey(rec: string | null): number {
   return count * weight + strictnessTieBreaker;
 }
 
+const END_OF_DAY = "23:59:59";
+
 const compareValues = (
   a: string | string[] | number | boolean | null,
   b: string | string[] | number | boolean | null,
@@ -94,6 +96,17 @@ const sortTodoObjects = (
         compareResult = -1; // b is null/invalid → sorts last
       } else {
         compareResult = invert ? keyB - keyA : keyA - keyB;
+      }
+    } else if (value === "due") {
+      compareResult = compareValues(a.due, b.due, invert);
+      // Same due date: order by time. Todos without a time count as due at
+      // the end of the day, so they sort after timed ones.
+      if (compareResult === 0 && a.due && b.due) {
+        compareResult = compareValues(
+          a.dueTime ?? END_OF_DAY,
+          b.dueTime ?? END_OF_DAY,
+          invert,
+        );
       }
     } else {
       compareResult = compareValues(a[value], b[value], invert);

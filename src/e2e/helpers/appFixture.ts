@@ -99,6 +99,7 @@ function buildAppFixture(welcomeScreenShown: boolean) {
         useHumanFriendlyDates: false,
         burndown: false,
         burndownWindow: 7,
+        burndownWarning: 2,
         excludeLinesWithPrefix: null,
         channel: "Test",
         menuBarVisibility: true,

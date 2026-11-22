@@ -268,3 +268,60 @@ describe("rec sorting", () => {
     });
   });
 });
+
+describe("due time sorting", () => {
+  const due = [{ value: "due" as const, invert: false }];
+  const todo = (line: string) => createTodoObject(1, line);
+
+  it("sorts by date first", () => {
+    expect(
+      sortTodoObjects(
+        todo("a due:2026-11-22 due_time:2300"),
+        todo("b due:2026-11-23 due_time:0100"),
+        due,
+      ),
+    ).toBeLessThan(0);
+  });
+
+  it("sorts the same day by time", () => {
+    expect(
+      sortTodoObjects(
+        todo("a due:2026-11-23 due_time:0900"),
+        todo("b due:2026-11-23 due_time:1430"),
+        due,
+      ),
+    ).toBeLessThan(0);
+  });
+
+  it("sorts untimed todos after timed ones on the same day", () => {
+    expect(
+      sortTodoObjects(
+        todo("a due:2026-11-23"),
+        todo("b due:2026-11-23 due_time:2359"),
+        due,
+      ),
+    ).toBeGreaterThan(0);
+  });
+
+  it("treats two untimed todos on the same day as equal", () => {
+    expect(
+      sortTodoObjects(todo("a due:2026-11-23"), todo("b due:2026-11-23"), due),
+    ).toBe(0);
+  });
+
+  it("inverts the time order too", () => {
+    expect(
+      sortTodoObjects(
+        todo("a due:2026-11-23 due_time:0900"),
+        todo("b due:2026-11-23 due_time:1430"),
+        [{ value: "due", invert: true }],
+      ),
+    ).toBeGreaterThan(0);
+  });
+
+  it("still sorts todos without a due date last", () => {
+    expect(
+      sortTodoObjects(todo("a"), todo("b due:2026-11-23 due_time:0900"), due),
+    ).toBeGreaterThan(0);
+  });
+});

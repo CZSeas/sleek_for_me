@@ -30,6 +30,8 @@ export interface VisibleSettings {
     dependsOn?: string[];
     min?: number;
     max?: number;
+    // Use the value of another setting as the maximum
+    maxFrom?: string;
     unit?: string;
     unitKey?: string;
     step?: number;
@@ -56,6 +58,14 @@ const visibleSettings: VisibleSettings = {
     style: "slider",
     min: 7,
     max: 30,
+    step: 1,
+    unitKey: "settings.days",
+    dependsOn: ["burndown"],
+  },
+  burndownWarning: {
+    style: "slider",
+    min: 1,
+    maxFrom: "burndownWindow",
     step: 1,
     unitKey: "settings.days",
     dependsOn: ["burndown"],
@@ -298,7 +308,13 @@ const SettingsComponent: React.FC<SettingsComponentProps> = memo(
                       `${value}${settingValue.unitKey ? t(settingValue.unitKey) : (settingValue.unit ?? "")}`
                     }
                     min={settingValue.min}
-                    max={settingValue.max}
+                    max={
+                      settingValue.maxFrom
+                        ? (settings[
+                            settingValue.maxFrom as keyof SettingStore
+                          ] as number)
+                        : settingValue.max
+                    }
                     onChange={(_, value: number | number[]) =>
                       store.setConfig(settingName, value)
                     }

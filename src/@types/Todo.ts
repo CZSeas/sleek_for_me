@@ -15,6 +15,8 @@ export interface TodoObject {
   priority: string | null;
   hidden: boolean;
   due: string | null;
+  // Optional time of day for the due date as HH:mm (stored as due_time:HHmm)
+  dueTime: string | null;
   dueString: string | null;
   t: string | null;
   tString: string | null;

@@ -53,9 +53,11 @@ const Row: React.FC<RowProps> = memo(
     const burndown = settings.burndown
       ? getBurndown(
           todoObject.due,
+          todoObject.dueTime,
           todoObject.complete,
           now,
           settings.burndownWindow ?? 7,
+          settings.burndownWarning ?? 2,
         )
       : null;
     const { handleContextMenu: handleAttributeContextMenu } =

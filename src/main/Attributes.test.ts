@@ -31,6 +31,7 @@ function todo(overrides: Partial<TodoObject> = {}): TodoObject {
     projects: [],
     contexts: [],
     due: null,
+    dueTime: null,
     dueString: null,
     t: null,
     tString: null,

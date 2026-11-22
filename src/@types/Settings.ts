@@ -12,6 +12,7 @@ export interface SettingStore {
   useHumanFriendlyDates: boolean;
   burndown: boolean;
   burndownWindow: number;
+  burndownWarning: number;
   bulkTodoCreation: boolean;
   weekStart: 1 | 6 | 0;
   language: string;

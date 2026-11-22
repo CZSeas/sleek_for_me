@@ -10,6 +10,7 @@ import { lineBreakPlaceholder } from "../Shared";
 import { DateTime } from "luxon";
 import { TodoObject } from "@sleek-types";
 import { Badge } from "../../types/badge";
+import { parseStoredDueTime, toStoredDueTime } from "./DueTime";
 
 let linesInFile: string[];
 const badge: Badge = { count: 0 };
@@ -37,9 +38,21 @@ function createTodoObject(
     if (attributeType === "priority") {
       const value = attributeValue === "-" ? null : attributeValue;
       JsTodoTxtObject.setPriority(value);
+    } else if (attributeType === "due_time") {
+      // The file stores HHmm, the app passes HH:mm
+      const stored = toStoredDueTime(attributeValue);
+      if (!stored) {
+        JsTodoTxtObject.removeExtension("due_time");
+      } else {
+        JsTodoTxtObject.setExtension("due_time", stored);
+      }
     } else {
       if (!attributeValue) {
         JsTodoTxtObject.removeExtension(attributeType);
+        // A time without a due date makes no sense, so clearing the date
+        // clears the time as well
+        if (attributeType === "due")
+          JsTodoTxtObject.removeExtension("due_time");
       } else {
         JsTodoTxtObject.setExtension(attributeType, attributeValue);
       }
@@ -56,6 +69,14 @@ function createTodoObject(
   const due = speakingDates["due:"]?.date || null;
   const dueString = speakingDates["due:"]?.string || null;
   const notify = speakingDates["due:"]?.notify || false;
+  // Read after the update above, the extensions captured earlier are stale
+  const dueTime = due
+    ? parseStoredDueTime(
+        JsTodoTxtObject.extensions().find(
+          (extension) => extension.key === "due_time",
+        )?.value,
+      )
+    : null;
   const t = speakingDates["t:"]?.date || null;
   const tString = speakingDates["t:"]?.string || null;
   const hidden = extensions.some(
@@ -105,6 +126,7 @@ function createTodoObject(
     contexts: contexts,
     projects: projects,
     due,
+    dueTime,
     dueString,
     notify,
     t,

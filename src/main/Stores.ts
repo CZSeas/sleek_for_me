@@ -164,6 +164,7 @@ const migrations = {
     console.log("Migrating settings store → 2.1.3: burndown");
     config.set("burndown", false);
     config.set("burndownWindow", 7);
+    config.set("burndownWarning", 2);
   },
   "2.1.2": (colors) => {
     console.log("Repairing priority A selected color → 2.1.2");
@@ -221,6 +222,9 @@ if (SettingsStore.get("burndown") === undefined) {
 }
 if (SettingsStore.get("burndownWindow") === undefined) {
   SettingsStore.set("burndownWindow", 7);
+}
+if (SettingsStore.get("burndownWarning") === undefined) {
+  SettingsStore.set("burndownWarning", 2);
 }
 
 let _filtersStore: Store | null = null;
