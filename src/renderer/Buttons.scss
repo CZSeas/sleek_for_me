@@ -66,6 +66,7 @@ button {
   // left the time value hanging at the top of the chip
   [data-todotxt-attribute="due_time"] button {
     align-items: center;
+    padding: 0em 0.4em 0em 0em;;
   }
 
   &.group {

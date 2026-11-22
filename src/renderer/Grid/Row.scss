@@ -78,11 +78,22 @@
         padding: 0;
       }
     }
+    // Same compact treatment as the due, t and rec chips above; the time chip
+    // is excluded from the generic button padding below
+    [data-todotxt-attribute="due_time"] {
+      button {
+        padding: 0em 0.4em 0em 0em;
+      }
+
+      div {
+        padding: 0;
+      }
+    }
     .filter:not([data-todotxt-attribute="priority"]):not(
         [data-todotxt-attribute="t"]
       ):not([data-todotxt-attribute="due"]):not(
-        [data-todotxt-attribute="rec"]
-      ) {
+        [data-todotxt-attribute="due_time"]
+      ):not([data-todotxt-attribute="rec"]) {
       button {
         padding: 0.2em 0.4em;
       }
